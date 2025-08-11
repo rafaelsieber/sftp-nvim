@@ -1,0 +1,9 @@
+{
+  "host": "example.com",
+  "port": 22,
+  "username": "your-username",
+  "password": "",
+  "remote_path": "/var/www/html",
+  "use_key": true,
+  "key_path": "~/.ssh/id_rsa"
+}

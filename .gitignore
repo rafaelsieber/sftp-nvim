@@ -1,0 +1,14 @@
+# SFTP configuration files (contain sensitive data)
+.sftp-config.json
+
+# Lua
+*.lua~
+
+# Vim
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,6 +1,6 @@
 return {
-  "rafael/sftp-nvim",
-  dev = true, -- Set to true if you're developing locally
+  dir = "/home/rafael/Projetos/sftp-nvim", -- Use local directory
+  name = "sftp-nvim",
   config = function()
     require("sftp-nvim").setup({
       -- Configuration options can be added here

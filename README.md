@@ -1,13 +1,16 @@
 # SFTP-Nvim
 
-A simple Neovim plugin for LazyVim that allows you to save SFTP server configurations and upload files to remote servers.
+A simple yet powerful Neovim plugin that allows you to save SFTP server configurations, upload files, and download files/folders from remote servers with an intuitive interface.
 
 ## Features
 
-- Save SFTP configuration to your project directory
-- Upload current file to remote server via SFTP/SCP
-- Support for SSH key and password authentication
-- Simple commands and key mappings
+- 📁 **Bidirectional Transfer**: Upload files to remote server and download files/folders from remote
+- ⚙️ **Project-based Configuration**: Save SFTP configuration per project directory
+- 🔐 **Dual Authentication**: Support for SSH key and password authentication
+- 🎯 **Smart File Selection**: Visual distinction between files (📄) and folders (📁)
+- 🔍 **Telescope Integration**: Uses vim.ui.select() for better UX (works with Telescope, fzf, or fallback)
+- 📦 **Recursive Downloads**: Download entire folders or individual files
+- ⌨️ **Simple Commands**: Easy-to-use commands and key mappings
 
 ## Installation
 
@@ -30,12 +33,14 @@ return {
   cmd = {
     "SftpSetup",
     "SftpUpload", 
-    "SftpConfig"
+    "SftpConfig",
+    "SftpDownload"
   },
   keys = {
     { "<leader>fs", "<cmd>SftpSetup<cr>", desc = "Setup SFTP config" },
     { "<leader>fu", "<cmd>SftpUpload<cr>", desc = "Upload current file via SFTP" },
     { "<leader>fc", "<cmd>SftpConfig<cr>", desc = "Show SFTP config" },
+    { "<leader>fd", "<cmd>SftpDownload<cr>", desc = "Download file from remote via SFTP" },
   },
 }
 ```
@@ -50,12 +55,14 @@ If you're developing this plugin locally, make sure to set `dev = true` in your 
 
 - `:SftpSetup` - Configure SFTP connection settings
 - `:SftpUpload` - Upload the current file to the remote server
+- `:SftpDownload` - Browse and download files/folders from remote server
 - `:SftpConfig` - Show current SFTP configuration
 
 ### Key Mappings (default)
 
 - `<leader>fs` - Setup SFTP config
 - `<leader>fu` - Upload current file
+- `<leader>fd` - Download files/folders from remote
 - `<leader>fc` - Show SFTP config
 
 ### Configuration File
@@ -76,10 +83,41 @@ The plugin creates a `.sftp-config.json` file in your project root with the foll
 
 ### Workflow
 
+#### Upload Workflow
 1. Open your project in Neovim
 2. Run `:SftpSetup` to configure your server connection
 3. Open any file you want to upload
 4. Run `:SftpUpload` or press `<leader>fu` to upload the current file
+
+#### Download Workflow
+1. Ensure SFTP is configured (run `:SftpSetup` if needed)
+2. Run `:SftpDownload` or press `<leader>fd`
+3. Browse the remote files and folders:
+   - 📁 Folders are listed first
+   - 📄 Files are listed after folders
+4. Select any file or folder to download to your current working directory
+
+## User Interface
+
+The download feature provides an enhanced user experience:
+
+- **Telescope Integration**: If you have Telescope installed, you'll get a beautiful fuzzy-findable picker
+- **fzf Support**: Works with fzf-lua for fast native selection
+- **Fallback UI**: Simple vim selection menu if no picker is available
+- **Visual Distinction**: Clear icons distinguish between files and folders
+- **Cancelable**: Press `<Esc>` to cancel the selection
+
+## File Structure
+
+The plugin is organized in a modular structure:
+
+```
+lua/sftp-nvim/
+├── init.lua        # Main entry point and command registration
+├── config.lua      # Configuration management
+├── upload.lua      # File upload functionality  
+└── download.lua    # File/folder download and browsing
+```
 
 ## Requirements
 
@@ -124,4 +162,26 @@ your-project/
 └── README.md
 ```
 
-When uploading `src/main.js`, it will be uploaded to `remote_path/src/main.js` on the server.
+**Upload**: When uploading `src/main.js`, it will be uploaded to `remote_path/src/main.js` on the server.
+
+**Download**: When downloading from remote, files and folders are downloaded to your current working directory maintaining their names.
+
+## Recent Updates
+
+- ✨ **Added Download Feature**: Browse and download files/folders from remote server
+- 🎨 **Improved UI**: Replaced notifications with vim.ui.select() for better user experience  
+- 📁 **Folder Support**: Download entire directories recursively
+- 🏗️ **Modular Architecture**: Split code into focused modules for better maintainability
+- 🔍 **Visual File Types**: Clear distinction between files and folders with icons
+
+## Development
+
+This plugin was developed with the assistance of AI agents to ensure clean code architecture and modern Neovim plugin best practices.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.

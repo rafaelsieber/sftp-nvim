@@ -75,8 +75,31 @@ function M.download_file()
     end
     
     local cwd = get_cwd()
-    local item_name = choice.path:match("[^/]+$")
-    local local_path = cwd .. "/" .. item_name
+    
+    -- Calculate relative path from remote_path to maintain directory structure
+    local relative_path = choice.path
+    if sftp_config.remote_path and sftp_config.remote_path ~= "/" then
+      -- Remove remote_path prefix to get relative path
+      local remote_path_clean = sftp_config.remote_path:gsub("/$", "") -- Remove trailing slash
+      relative_path = choice.path:gsub("^" .. vim.pesc(remote_path_clean) .. "/?", "")
+    end
+    
+    -- If it's a file, use the relative path directly
+    -- If it's a folder, we want to download its contents maintaining structure
+    local local_path
+    if choice.is_dir then
+      -- For directories, create the full path structure
+      local_path = cwd .. "/" .. relative_path
+    else
+      -- For files, create the full path including parent directories
+      local_path = cwd .. "/" .. relative_path
+    end
+    
+    -- Create parent directories if they don't exist
+    local parent_dir = local_path:match("(.+)/[^/]+$")
+    if parent_dir and parent_dir ~= cwd then
+      vim.fn.mkdir(parent_dir, "p")
+    end
     
     -- Build SCP command
     local cmd = "scp"
@@ -98,7 +121,7 @@ function M.download_file()
     end
     
     local item_type = choice.is_dir and "folder" or "file"
-    vim.notify("Downloading " .. item_type .. " " .. choice.path .. "...", vim.log.levels.INFO)
+    vim.notify("Downloading " .. item_type .. " " .. choice.path .. " to " .. local_path .. "...", vim.log.levels.INFO)
     
     local result = vim.fn.system(cmd)
     local exit_code = vim.v.shell_error

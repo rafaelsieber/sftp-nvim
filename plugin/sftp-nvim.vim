@@ -10,3 +10,4 @@ let g:loaded_sftp_nvim = 1
 command! SftpSetup lua require('sftp-nvim').setup_config()
 command! SftpUpload lua require('sftp-nvim').upload_file()
 command! SftpConfig lua require('sftp-nvim').show_config()
+command! SftpDownload lua require('sftp-nvim').download_file()

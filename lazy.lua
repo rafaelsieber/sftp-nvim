@@ -8,7 +8,8 @@ return {
   cmd = {
     "SftpSetup",
     "SftpUpload", 
-    "SftpConfig"
+    "SftpConfig",
+    "SftpDownload"
   },
   keys = {
     { "<leader>fs", "<cmd>SftpSetup<cr>", desc = "Setup SFTP config" },

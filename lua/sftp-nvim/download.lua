@@ -84,11 +84,11 @@ function M.download_file()
       relative_path = choice.path:gsub("^" .. vim.pesc(remote_path_clean) .. "/?", "")
     end
     
-    -- If it's a file, use the relative path directly
-    -- If it's a folder, we want to download its contents maintaining structure
+    -- For both files and directories, we want to preserve the full path structure
     local local_path
     if choice.is_dir then
-      -- For directories, create the full path structure
+      -- For directories, we want to create the directory structure and download its contents
+      -- The path should include the directory name itself
       local_path = cwd .. "/" .. relative_path
     else
       -- For files, create the full path including parent directories
@@ -114,20 +114,24 @@ function M.download_file()
       cmd = cmd .. " -i " .. sftp_config.key_path
     end
     
+    -- For both files and directories, we download to the calculated local path
+    local remote_source = choice.path
+    local local_target = local_path
+    
     if sftp_config.use_key then
-      cmd = cmd .. " " .. sftp_config.username .. "@" .. sftp_config.host .. ":" .. choice.path .. " " .. local_path
+      cmd = cmd .. " " .. sftp_config.username .. "@" .. sftp_config.host .. ":" .. remote_source .. " " .. local_target
     else
-      cmd = "sshpass -p '" .. sftp_config.password .. "' " .. cmd .. " " .. sftp_config.username .. "@" .. sftp_config.host .. ":" .. choice.path .. " " .. local_path
+      cmd = "sshpass -p '" .. sftp_config.password .. "' " .. cmd .. " " .. sftp_config.username .. "@" .. sftp_config.host .. ":" .. remote_source .. " " .. local_target
     end
     
     local item_type = choice.is_dir and "folder" or "file"
-    vim.notify("Downloading " .. item_type .. " " .. choice.path .. " to " .. local_path .. "...", vim.log.levels.INFO)
+    vim.notify("Downloading " .. item_type .. " " .. choice.path .. " to " .. local_target .. "...", vim.log.levels.INFO)
     
     local result = vim.fn.system(cmd)
     local exit_code = vim.v.shell_error
     
     if exit_code == 0 then
-      vim.notify("Downloaded " .. item_type .. " to " .. local_path, vim.log.levels.INFO)
+      vim.notify("Downloaded " .. item_type .. " to " .. local_target, vim.log.levels.INFO)
     else
       vim.notify("Download failed: " .. result, vim.log.levels.ERROR)
     end

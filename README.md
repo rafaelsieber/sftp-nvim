@@ -26,7 +26,7 @@ Or add the plugin configuration directly to your LazyVim setup:
 
 ```lua
 return {
-  "rafael/sftp-nvim",
+  "rafaelsieber/sftp-nvim",
   config = function()
     require("sftp-nvim").setup()
   end,

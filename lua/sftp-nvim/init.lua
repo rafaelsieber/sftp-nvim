@@ -123,7 +123,6 @@ function M.setup_config()
   
   -- Authentication method
   local auth_method = get_input("Authentication (key/password)", config.use_key and "key" or "password")
-  new_config.use_key = auth_method == "key"
   
   if new_config.use_key then
     new_config.key_path = get_input("SSH Key path", config.key_path)
@@ -138,7 +137,6 @@ function M.setup_config()
 end
 
 -- Upload current file
-function M.upload_file()
   local config = load_config()
   if not config then
     vim.notify("No SFTP config found. Run :SftpSetup first", vim.log.levels.ERROR)
@@ -149,7 +147,6 @@ function M.upload_file()
   if not config.host or config.host == "" then
     vim.notify("Host not configured", vim.log.levels.ERROR)
     return
-  end
   
   if not config.username or config.username == "" then
     vim.notify("Username not configured", vim.log.levels.ERROR)
@@ -166,7 +163,6 @@ function M.upload_file()
       cmd = cmd .. " -i " .. config.key_path
     end
     cmd = cmd .. " " .. config.username .. "@" .. config.host .. " 'find " .. config.remote_path .. " -type f'"
-    if not config.use_key then
       cmd = "sshpass -p '" .. config.password .. "' " .. cmd
     end
     local result = vim.fn.systemlist(cmd)
@@ -216,7 +212,6 @@ function M.upload_file()
     vim.notify("Downloading " .. remote_file .. "...", vim.log.levels.INFO)
     local result = vim.fn.system(cmd)
     local exit_code = vim.v.shell_error
-    if exit_code == 0 then
       vim.notify("Downloaded to " .. local_file, vim.log.levels.INFO)
     else
       vim.notify("Download failed: " .. result, vim.log.levels.ERROR)

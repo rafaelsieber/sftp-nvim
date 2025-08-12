@@ -156,76 +156,6 @@ function M.upload_file()
     return
   end
   
-  -- List remote files using ssh
-  local function list_remote_files(config)
-    local cmd = "ssh "
-    if config.port and config.port ~= 22 then
-      cmd = cmd .. " -p " .. config.port
-    end
-    if config.use_key and config.key_path then
-      cmd = cmd .. " -i " .. config.key_path
-    end
-    cmd = cmd .. " " .. config.username .. "@" .. config.host .. " 'find " .. config.remote_path .. " -type f'"
-    if not config.use_key then
-      cmd = "sshpass -p '" .. config.password .. "' " .. cmd
-    end
-    local result = vim.fn.systemlist(cmd)
-    return result
-  end
-
-  -- Download selected file from remote
-  function M.download_file()
-    local config = load_config()
-    if not config then
-      vim.notify("No SFTP config found. Run :SftpSetup first", vim.log.levels.ERROR)
-      return
-    end
-    local files = list_remote_files(config)
-    if not files or #files == 0 then
-      vim.notify("No files found on remote.", vim.log.levels.ERROR)
-      return
-    end
-    -- Simple selection: show numbered list and ask for input
-    local choices = {}
-    for i, f in ipairs(files) do
-      table.insert(choices, i .. ": " .. f)
-    end
-    vim.notify("Remote files:\n" .. table.concat(choices, "\n"), vim.log.levels.INFO)
-    local idx = tonumber(vim.fn.input("Select file number to download: "))
-    if not idx or not files[idx] then
-      vim.notify("Invalid selection.", vim.log.levels.ERROR)
-      return
-    end
-    local remote_file = files[idx]
-    local cwd = get_cwd()
-    local filename = remote_file:match("[^/]+$")
-    local local_file = cwd .. "/" .. filename
-    -- Build SCP command (reverse direction)
-    local cmd = "scp"
-    if config.port and config.port ~= 22 then
-      cmd = cmd .. " -P " .. config.port
-    end
-    if config.use_key and config.key_path then
-      cmd = cmd .. " -i " .. config.key_path
-    end
-    if config.use_key then
-      cmd = cmd .. " " .. config.username .. "@" .. config.host .. ":" .. remote_file .. " " .. local_file
-    else
-      cmd = "sshpass -p '" .. config.password .. "' " .. cmd .. " " .. config.username .. "@" .. config.host .. ":" .. remote_file .. " " .. local_file
-    end
-    vim.notify("Downloading " .. remote_file .. "...", vim.log.levels.INFO)
-    local result = vim.fn.system(cmd)
-    local exit_code = vim.v.shell_error
-    if exit_code == 0 then
-      vim.notify("Downloaded to " .. local_file, vim.log.levels.INFO)
-    else
-      vim.notify("Download failed: " .. result, vim.log.levels.ERROR)
-    end
-  end
-  
-  end
-  end
-  
   -- Get current file
   local current_file = vim.fn.expand("%:p")
   if current_file == "" then
@@ -294,9 +224,7 @@ function M.download_file()
   for i, f in ipairs(files) do
     table.insert(choices, i .. ": " .. f)
   end
-  vim.notify("Remote files:
-" .. table.concat(choices, "
-"), vim.log.levels.INFO)
+  vim.notify("Remote files:\n" .. table.concat(choices, "\n"), vim.log.levels.INFO)
   local idx = tonumber(vim.fn.input("Select file number to download: "))
   if not idx or not files[idx] then
     vim.notify("Invalid selection.", vim.log.levels.ERROR)
@@ -326,6 +254,7 @@ function M.download_file()
     vim.notify("Downloaded to " .. local_file, vim.log.levels.INFO)
   else
     vim.notify("Download failed: " .. result, vim.log.levels.ERROR)
+  end
 end
 
 -- Show current configuration

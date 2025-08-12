@@ -14,5 +14,6 @@ return {
     { "<leader>fs", "<cmd>SftpSetup<cr>", desc = "Setup SFTP config" },
     { "<leader>fu", "<cmd>SftpUpload<cr>", desc = "Upload current file via SFTP" },
     { "<leader>fc", "<cmd>SftpConfig<cr>", desc = "Show SFTP config" },
+    { "<leader>fd", "<cmd>SftpDownload<cr>", desc = "Download file from remote via SFTP" },
   },
 }

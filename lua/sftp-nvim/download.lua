@@ -116,7 +116,29 @@ function M.download_file()
     
     -- For both files and directories, we download to the calculated local path
     local remote_source = choice.path
-    local local_target = local_path
+    local local_target
+    
+    if choice.is_dir then
+      -- For directories, we want to download the contents into the parent directory
+      -- so that the folder structure is preserved correctly
+      local parent_dir = local_path:match("(.+)/[^/]+$")
+      if parent_dir then
+        local_target = parent_dir .. "/"
+        -- Make sure the parent directory exists
+        vim.fn.mkdir(parent_dir, "p")
+      else
+        local_target = cwd .. "/"
+      end
+      
+      -- Remove existing directory to ensure fresh download (overwrite)
+      if vim.fn.isdirectory(local_path) == 1 then
+        vim.fn.delete(local_path, "rf")
+        vim.notify("Removing existing directory " .. local_path .. " for fresh download...", vim.log.levels.INFO)
+      end
+    else
+      -- For files, download directly to the target path (SCP overwrites files by default)
+      local_target = local_path
+    end
     
     if sftp_config.use_key then
       cmd = cmd .. " " .. sftp_config.username .. "@" .. sftp_config.host .. ":" .. remote_source .. " " .. local_target
@@ -125,13 +147,14 @@ function M.download_file()
     end
     
     local item_type = choice.is_dir and "folder" or "file"
-    vim.notify("Downloading " .. item_type .. " " .. choice.path .. " to " .. local_target .. "...", vim.log.levels.INFO)
+    local display_target = choice.is_dir and local_path or local_target
+    vim.notify("Downloading " .. item_type .. " " .. choice.path .. " to " .. display_target .. "...", vim.log.levels.INFO)
     
     local result = vim.fn.system(cmd)
     local exit_code = vim.v.shell_error
     
     if exit_code == 0 then
-      vim.notify("Downloaded " .. item_type .. " to " .. local_target, vim.log.levels.INFO)
+      vim.notify("Downloaded " .. item_type .. " to " .. display_target, vim.log.levels.INFO)
     else
       vim.notify("Download failed: " .. result, vim.log.levels.ERROR)
     end

@@ -55,6 +55,7 @@ If you're developing this plugin locally, make sure to set `dev = true` in your 
 
 - `:SftpSetup` - Configure SFTP connection settings
 - `:SftpUpload` - Upload the current file to the remote server
+- `:SftpUploadDir` - Browse and upload files/directories from local to remote server
 - `:SftpDownload` - Browse and download files/folders from remote server
 - `:SftpConfig` - Show current SFTP configuration
 
@@ -62,6 +63,7 @@ If you're developing this plugin locally, make sure to set `dev = true` in your 
 
 - `<leader>fs` - Setup SFTP config
 - `<leader>fu` - Upload current file
+- `<leader>fU` - Upload files/directories (with selection)
 - `<leader>fd` - Download files/folders from remote
 - `<leader>fc` - Show SFTP config
 
@@ -86,8 +88,18 @@ The plugin creates a `.sftp-config.json` file in your project root with the foll
 #### Upload Workflow
 1. Open your project in Neovim
 2. Run `:SftpSetup` to configure your server connection
+
+**Upload Current File:**
 3. Open any file you want to upload
 4. Run `:SftpUpload` or press `<leader>fu` to upload the current file
+
+**Upload Files/Directories:**
+3. Run `:SftpUploadDir` or press `<leader>fU`
+4. Select from the list of local files and directories:
+   - 📁 Directories are listed first
+   - 📄 Files are listed after directories
+5. If the remote file/directory exists, you'll get a confirmation dialog
+6. The entire directory structure will be preserved and uploaded recursively
 
 #### Download Workflow
 1. Ensure SFTP is configured (run `:SftpSetup` if needed)

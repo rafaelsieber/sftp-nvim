@@ -9,6 +9,7 @@ local download = require('sftp-nvim.download')
 M.setup_config = config.setup_config
 M.show_config = config.show_config
 M.upload_file = upload.upload_file
+M.upload_directory = upload.upload_directory
 M.download_file = download.download_file
 
 -- Setup plugin
@@ -18,6 +19,7 @@ function M.setup(opts)
   -- Create user commands
   vim.api.nvim_create_user_command("SftpSetup", M.setup_config, {})
   vim.api.nvim_create_user_command("SftpUpload", M.upload_file, {})
+  vim.api.nvim_create_user_command("SftpUploadDir", M.upload_directory, {})
   vim.api.nvim_create_user_command("SftpConfig", M.show_config, {})
   vim.api.nvim_create_user_command("SftpDownload", M.download_file, {})
 end
